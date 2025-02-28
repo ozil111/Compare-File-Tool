@@ -15,11 +15,7 @@ This repository provides a robust file comparison tool that supports various fil
 
 ## Installation
 
-This tool requires Python 3.6 or higher. Install the required dependencies using:
-
-```sh
-pip install -r requirements.txt
-```
+This tool requires Python 3.6 or higher. No required dependencies. 
 
 ## Usage
 
