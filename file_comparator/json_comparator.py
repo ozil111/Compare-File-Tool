@@ -31,7 +31,13 @@ class JsonComparator(TextComparator):
         # Convert to a single string
         json_text = ''.join(text_content)
         try:
-            return json.loads(json_text)
+            json_data = json.loads(json_text)
+            if self.key_field:
+                # Only keep the specified key field(s)
+                key_fields = self.key_field if isinstance(self.key_field, list) else [self.key_field]
+                filtered_data = {key: json_data[key] for key in key_fields if key in json_data}
+                return filtered_data
+            return json_data
         except json.JSONDecodeError as e:
             raise ValueError(f"Invalid JSON in {file_path}: {str(e)}")
 

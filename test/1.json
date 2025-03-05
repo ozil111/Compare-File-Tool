@@ -1,0 +1,278 @@
+{
+  "basics": {
+    "name": "王潇仝",
+    "headline": "",
+    "email": "xiaotongwang98@gmail.com",
+    "phone": "18648483389",
+    "location": "上海",
+    "url": {
+      "label": "",
+      "href": ""
+    },
+    "customFields": [],
+    "picture": {
+      "url": "",
+      "size": 64,
+      "aspectRatio": 1,
+      "borderRadius": 0,
+      "effects": {
+        "hidden": false,
+        "border": false,
+        "grayscale": false
+      }
+    }
+  },
+  "sections": {
+    "summary": {
+      "name": "Summary",
+      "columns": 1,
+      "separateLinks": true,
+      "visible": true,
+      "id": "summary",
+      "content": ""
+    },
+    "awards": {
+      "name": "Awards",
+      "columns": 1,
+      "separateLinks": true,
+      "visible": true,
+      "id": "awards",
+      "items": []
+    },
+    "certifications": {
+      "name": "Certifications",
+      "columns": 1,
+      "separateLinks": true,
+      "visible": true,
+      "id": "certifications",
+      "items": []
+    },
+    "education": {
+      "name": "Education",
+      "columns": 1,
+      "separateLinks": true,
+      "visible": true,
+      "id": "education",
+      "items": [
+        {
+          "id": "u10ye37aqgiqain2jc1ph6fz",
+          "visible": true,
+          "institution": "中南大学",
+          "studyType": "",
+          "area": "工程力学",
+          "score": "",
+          "date": "2018.9-2022.5",
+          "summary": "<p>主要课程：理论力学；材料力学； 弹性力学； 塑性力学；流体力学；振动力学；计算力学；结构力学 </p><p>个人积累：</p><p>数学建模课程期间 ， 自学了智能算法入门 ，对神经网络、遗传算法 、蚁群算法等传统智能算法以及一些最新都有所了解 。</p>",
+          "url": {
+            "label": "",
+            "href": ""
+          }
+        },
+        {
+          "id": "j6swt4mcevzcu9er0mj0hoty",
+          "visible": true,
+          "institution": "南加州大学",
+          "studyType": "",
+          "area": "结构工程",
+          "score": "",
+          "date": "2022.8-2024.5",
+          "summary": "<p>主要课程： 结构动力学; 高级钢结构设计;有限元分析; 预应力混凝土;强震分析；数字信号处理；地震工程</p><p>个人积累：</p><ol><li><p>学习结构动力学期间 ，掌握了变分原理 、张量分析等工具 ，很好的理解了结构动力学的原理与推导过程 ， 并以此为基础自己开发解决结构动力学问题的Matlab软件 。并且用于桥梁振动分析。</p></li><li><p>学习有限元用c++完成了一个面向对象的有限元软件的编写 ，结果与abaqus的结果误差小于2% 。对有限元原理有比较深刻的理 解 ，除了已经掌握的有限元软件（ Ansys、Nastran、Midas 、abaqus 、openseespy）， 其他有限元软件同样可以快速上手 。</p></li></ol>",
+          "url": {
+            "label": "",
+            "href": ""
+          }
+        }
+      ]
+    },
+    "experience": {
+      "name": "Experience",
+      "columns": 1,
+      "separateLinks": true,
+      "visible": true,
+      "id": "experience",
+      "items": [
+        {
+          "id": "mer6j0gt0cnp12xvblilz5xh",
+          "visible": true,
+          "company": "安世亚太集团",
+          "position": "CAE软件研发岗",
+          "location": "上海",
+          "date": "2024.7-至今",
+          "summary": "<ul><li><p>参与广州数控机床项目，主导求解器的瞬态动力学模块研发。完整设计包括中心差分法、newmark法、HHT法等多种积分方法的瞬态动力学模块。结果与Ansys对标</p></li><li><p>主导ROMAI项目，结合降阶模型与神经网络加速计算，线性静力分析训练好的模型运行时间仅需几秒，误差在1%左右。正在开发线性瞬态分析的降阶模型。</p></li><li><p>参与创维项目，主导非线性求解器收敛效率、精度以及稳定性优化。针对牛顿拉夫森法设计了line search提升收敛速度。开发弧长法提升后屈曲分析稳定性。优化初值选择方法，提升牛顿法稳定性。</p></li></ul>",
+          "url": {
+            "label": "",
+            "href": ""
+          }
+        }
+      ]
+    },
+    "volunteer": {
+      "name": "Volunteering",
+      "columns": 1,
+      "separateLinks": true,
+      "visible": true,
+      "id": "volunteer",
+      "items": []
+    },
+    "interests": {
+      "name": "Interests",
+      "columns": 1,
+      "separateLinks": true,
+      "visible": true,
+      "id": "interests",
+      "items": []
+    },
+    "languages": {
+      "name": "Languages",
+      "columns": 1,
+      "separateLinks": true,
+      "visible": true,
+      "id": "languages",
+      "items": [
+        {
+          "id": "bhbo0x5ll2fvxhub9whv8jpi",
+          "visible": true,
+          "name": "英语",
+          "description": "流利",
+          "level": 4
+        }
+      ]
+    },
+    "profiles": {
+      "name": "Profiles",
+      "columns": 1,
+      "separateLinks": true,
+      "visible": true,
+      "id": "profiles",
+      "items": []
+    },
+    "projects": {
+      "name": "Projects",
+      "columns": 1,
+      "separateLinks": true,
+      "visible": true,
+      "id": "projects",
+      "items": [
+        {
+          "id": "xo0cr11xfo4ducmfxj5tpggq",
+          "visible": true,
+          "name": "c++开发面向对象有限元求解器",
+          "description": "独立开发面向对象编程的有限元求解器",
+          "date": "2022.8-至今",
+          "summary": "<ul><li><p>使用工厂模式开发单元模块，实现自动注册单元类型，方便开发持续不断添加新单元</p></li><li><p>设计了一个带有监视器的数据管理模块，对矩阵生命周期进行统一管理，防止重复存储，及时清理不用矩阵优化内存。设计了多种监视器用于开发人员或高级用户debug，可以监控矩阵的生命周期、可以输出矩阵等。</p></li><li><p>使用工厂模式+策略模式设计积分器模块。方便后续持续优化积分器算法。</p></li></ul>",
+          "keywords": [],
+          "url": {
+            "label": "",
+            "href": ""
+          }
+        }
+      ]
+    },
+    "publications": {
+      "name": "Publications",
+      "columns": 1,
+      "separateLinks": true,
+      "visible": true,
+      "id": "publications",
+      "items": []
+    },
+    "references": {
+      "name": "References",
+      "columns": 1,
+      "separateLinks": true,
+      "visible": true,
+      "id": "references",
+      "items": []
+    },
+    "skills": {
+      "name": "Skills",
+      "columns": 3,
+      "separateLinks": true,
+      "visible": true,
+      "id": "skills",
+      "items": [
+        {
+          "id": "pfcv00v98lt4nrzwopxgo4q5",
+          "visible": true,
+          "name": "c++",
+          "description": "熟练",
+          "level": 4,
+          "keywords": []
+        },
+        {
+          "id": "a1sfzp8usb285nkq8y5gppmc",
+          "visible": true,
+          "name": "matlab",
+          "description": "精通",
+          "level": 5,
+          "keywords": []
+        },
+        {
+          "id": "bot8lkcqoem9lzmp7dcywj6k",
+          "visible": true,
+          "name": "python",
+          "description": "熟练",
+          "level": 4,
+          "keywords": []
+        }
+      ]
+    },
+    "custom": {}
+  },
+  "metadata": {
+    "template": "bronzor",
+    "layout": [
+      [
+        [
+          "profiles",
+          "summary",
+          "experience",
+          "education",
+          "projects",
+          "volunteer",
+          "references"
+        ],
+        [
+          "skills",
+          "interests",
+          "certifications",
+          "awards",
+          "publications",
+          "languages"
+        ]
+      ]
+    ],
+    "css": {
+      "value": ".section {\n\toutline: 1px solid #000;\n\toutline-offset: 4px;\n}",
+      "visible": false
+    },
+    "page": {
+      "margin": 18,
+      "format": "a4",
+      "options": {
+        "breakLine": false,
+        "pageNumbers": true
+      }
+    },
+    "theme": {
+      "background": "#ffffff",
+      "text": "#000000",
+      "primary": "#dc2626"
+    },
+    "typography": {
+      "font": {
+        "family": "PT Serif",
+        "subset": "latin",
+        "variants": [
+          "regular"
+        ],
+        "size": 14
+      },
+      "lineHeight": 1.5,
+      "hideIcons": false,
+      "underlineLinks": true
+    },
+    "notes": ""
+  },
+  "test":"1"
+}

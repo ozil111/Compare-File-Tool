@@ -1,0 +1,117 @@
+{
+    "test_cases": [
+        {
+            "name": "text_identical_default",
+            "description": "默认文本比较（相同文件）",
+            "command": "python ./compare_text.py",
+            "args": ["./test/1.bdf", "./test/1_copy.bdf"],
+            "expected": {
+                "output_contains": ["Files are identical"],
+                "return_code": 0
+            }
+        },
+        {
+            "name": "text_different_range",
+            "description": "带行范围限制的文本比较",
+            "command": "python ./compare_text.py",
+            "args": [
+                "./test/1.bdf", 
+                "./test/1_copy.bdf",
+                "--start-line=93",
+                "--end-line=96",
+                "--start-column=1",
+                "--end-column=30"
+            ],
+            "expected": {
+                "output_contains": ["Files are identical"],
+                "return_code": 0
+            }
+        },
+        {
+            "name": "json_exact_match",
+            "description": "严格JSON比较（相同文件）",
+            "command": "python ./compare_text.py",
+            "args": [
+                "./test/1.json",
+                "./test/1_copy.json",
+                "--file-type=json",
+                "--json-compare-mode=exact"
+            ],
+            "expected": {
+                "output_contains": ["Files are identical"],
+                "return_code": 0
+            }
+        },
+        {
+            "name": "json_key_based_match",
+            "description": "JSON键值比较（结构不同但关键字段匹配）",
+            "command": "python ./compare_text.py",
+            "args": [
+                "./test/1.json",
+                "./test/2.json",
+                "--file-type=json",
+                "--json-compare-mode=key-based",
+                "--json-key-field=\"phone\""
+            ],
+            "expected": {
+                "output_contains": ["Files are identical"],
+                "return_code": 0
+            }
+        },
+        {
+            "name": "binary_comparison",
+            "description": "二进制文件比较（带相似度计算）",
+            "command": "python ./compare_text.py",
+            "args": [
+                "./test/1.bdf",
+                "./test/2.bdf",
+                "--file-type=binary",
+                "--similarity",
+                "--chunk-size=4096"
+            ],
+            "expected": {
+                "output_contains": ["Similarity Index"],
+                "return_code": 1
+            }
+        },
+        {
+            "name": "multi_thread_comparison",
+            "description": "多线程文本比较",
+            "command": "python ./compare_text.py",
+            "args": [
+                "./test/1.bdf",
+                "./test/1_copy.bdf",
+                "--num-threads=8",
+                "--verbose"
+            ],
+            "expected": {
+                "output_contains": ["Files are identical"],
+                "return_code": 0
+            }
+        },
+        {
+            "name": "different_output_format",
+            "description": "JSON输出格式测试",
+            "command": "python ./compare_text.py",
+            "args": [
+                "./test/1.json",
+                "./test/2.json",
+                "--output-format=json"
+            ],
+            "expected": {
+                "output_contains": ["\"position\""],
+                "return_code": 1
+            }
+        },
+        {
+            "name": "auto_detect_filetype",
+            "description": "自动文件类型检测",
+            "command": "python ./compare_text.py",
+            "args": ["./test/1.bdf", "./test/1_copy.bdf"],
+            "expected": {
+                "output_contains": ["Auto-detected file type: text"],
+                "return_code": 0
+            }
+        }
+    ]
+}

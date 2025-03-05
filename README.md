@@ -11,11 +11,17 @@ This repository provides a robust file comparison tool that supports various fil
 - **Flexible output formats**: Results can be generated in plain text, JSON, or HTML.
 - **Customizable JSON key-based comparison**: Enables structured JSON comparisons based on specific keys.
 - **Binary file hashing and chunked comparison**: Efficiently detects differences in binary files.
+- **Similarity Index for binary files**: When comparing binary files, use the `--similarity` option to compute and display a similarity index based on the formula:  
+  **Similarity = 2 * LCS length / (file1 length + file2 length)**
 - **Extensible design**: New file formats can be added easily using the factory pattern.
 
 ## Installation
 
-This tool requires Python 3.6 or higher. No required dependencies. 
+This tool requires Python 3.6 or higher. Install the required dependencies using:
+
+```sh
+pip install -r requirements.txt
+```
 
 ## Usage
 
@@ -48,6 +54,8 @@ python compare_text.py file1.txt file2.txt \
 - `--json-compare-mode`: Specify JSON comparison mode (`exact` or `key-based`).
 - `--json-key-field`: Specify key fields for key-based JSON comparison (comma-separated for multiple keys).
 - `--verbose`: Enable detailed logs.
+- `--similarity`: (Binary files only) Compute and display the similarity index even if the files are not completely identical.
+- `--num-threads`: Specify the number of threads for parallel processing (default is 4).
 
 ## File Types Supported
 
@@ -69,7 +77,9 @@ Compares row-by-row, detecting mismatched columns or values.
 
 ### Binary Files
 
-Uses chunked byte-wise comparison and SHA-256 hashing to detect differences.
+Uses chunked byte-wise comparison and SHA-256 hashing to detect differences. Additionally, with the `--similarity` option, a similarity index is calculated using:
+
+**Similarity = 2 \* LCS length / (file1 length + file2 length)**
 
 ## Architecture
 

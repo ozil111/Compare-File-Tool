@@ -27,6 +27,9 @@ def parse_arguments():
     parser.add_argument("--output-format", choices=["text", "json", "html"], default="text",
                         help="Output format for the comparison result")
     parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose output")
+    parser.add_argument("--similarity", action="store_true",
+                        help="When comparing binary files, compute and show similarity index")
+    parser.add_argument("--num-threads", type=int, default=4, help="Number of threads for parallel processing")
     
     # Add JSON-specific comparison options
     json_group = parser.add_argument_group('JSON comparison options')
@@ -69,8 +72,13 @@ def main():
         comparator_kwargs = {
             "encoding": args.encoding,
             "chunk_size": args.chunk_size,
-            "verbose": args.verbose
+            "verbose": args.verbose,
+            "num_threads": args.num_threads
         }
+        
+        # If comparing binary files and similarity is enabled, pass the parameter
+        if file_type == "binary":
+            comparator_kwargs["similarity"] = args.similarity
         
         # Add JSON-specific options if applicable
         if file_type == "json" and args.json_compare_mode:

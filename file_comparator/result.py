@@ -41,19 +41,22 @@ class ComparisonResult:
         self.identical = None
         self.differences = []
         self.error = None
+        self.similarity = None  # 新增相似度属性
     
     def __str__(self):
         if self.error:
             return f"Error during comparison: {self.error}"
-            
+        lines = []
         if self.identical:
             range_str = self._get_range_str()
-            return f"Files are identical{range_str}."
+            lines.append(f"Files are identical{range_str}.")
         else:
-            result = [f"Files are different. Found {len(self.differences)} differences:"]
+            lines.append(f"Files are different. Found {len(self.differences)} differences:")
             for i, diff in enumerate(self.differences, 1):
-                result.append(f"{i}. {diff}")
-            return "\n".join(result)
+                lines.append(f"{i}. {diff}")
+            if self.similarity is not None:
+                lines.append(f"Similarity Index: {self.similarity:.2f}")
+        return "\n".join(lines)
     
     def _get_range_str(self):
         parts = []
@@ -87,6 +90,7 @@ class ComparisonResult:
             },
             "identical": self.identical,
             "differences": [diff.to_dict() for diff in self.differences],
+            "similarity": self.similarity,
             "error": self.error
         }
     
@@ -107,6 +111,8 @@ class ComparisonResult:
             html.append(f"<h2 class='identical'>Files are identical{range_str}.</h2>")
         else:
             html.append(f"<h2 class='different'>Files are different. Found {len(self.differences)} differences:</h2>")
+            if self.similarity is not None:
+                html.append(f"<p>Similarity Index: {self.similarity:.2f}</p>")
             html.append("<div class='diff-list'>")
             
             for i, diff in enumerate(self.differences, 1):
