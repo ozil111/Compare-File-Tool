@@ -1,30 +1,51 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+@file json_comparator.py
+@brief JSON file comparator implementation with support for exact and key-based comparison
+@author Xiaotong Wang
+@date 2025
+"""
+
 import json
 from .text_comparator import TextComparator
 from .result import Difference
 
 class JsonComparator(TextComparator):
+    """
+    @brief Comparator for JSON files with support for exact and key-based comparison
+    @details This class extends TextComparator to provide specialized JSON comparison
+             capabilities, including:
+             - Exact comparison of JSON structures
+             - Key-based comparison for lists of objects
+             - Detailed difference reporting with path information
+    """
+    
     def __init__(self, encoding="utf-8", chunk_size=8192, verbose=False, key_field=None, compare_mode="exact"):
         """
-        Initialize the JSON comparator.
-        
-        Parameters:
-        -----------
-        encoding : str
-            File encoding
-        chunk_size : int
-            Chunk size for reading files
-        verbose : bool
-            Enable verbose logging
-        key_field : str or list
-            Field name(s) to use as key for comparing JSON objects in lists
-        compare_mode : str
-            Comparison mode: 'exact' (default) or 'key-based'
+        @brief Initialize the JSON comparator
+        @param encoding str: File encoding
+        @param chunk_size int: Chunk size for reading files
+        @param verbose bool: Enable verbose logging
+        @param key_field str or list: Field name(s) to use as key for comparing JSON objects in lists
+        @param compare_mode str: Comparison mode: 'exact' (default) or 'key-based'
         """
         super().__init__(encoding, chunk_size, verbose)
         self.key_field = key_field
         self.compare_mode = compare_mode
 
     def read_content(self, file_path, start_line=0, end_line=None, start_column=0, end_column=None):
+        """
+        @brief Read and parse JSON content from file
+        @param file_path Path: Path to the JSON file
+        @param start_line int: Starting line number
+        @param end_line int: Ending line number
+        @param start_column int: Starting column number
+        @param end_column int: Ending column number
+        @return dict or list: Parsed JSON content
+        @throws ValueError: If JSON is invalid or key fields are missing
+        """
         # Read the text content using the parent class method
         text_content = super().read_content(file_path, start_line, end_line, start_column, end_column)
         
@@ -42,6 +63,12 @@ class JsonComparator(TextComparator):
             raise ValueError(f"Invalid JSON in {file_path}: {str(e)}")
 
     def compare_content(self, content1, content2):
+        """
+        @brief Compare JSON content using the specified comparison mode
+        @param content1 dict or list: First JSON content to compare
+        @param content2 dict or list: Second JSON content to compare
+        @return tuple: (bool, list) - (identical, differences)
+        """
         # Quick check for exact equality
         if content1 == content2:
             return True, []
@@ -57,7 +84,17 @@ class JsonComparator(TextComparator):
 
     def _compare_json_exact(self, obj1, obj2, path, differences, max_diffs=10):
         """
-        Perform exact JSON comparison (original implementation)
+        @brief Perform exact JSON comparison
+        @param obj1: First JSON object to compare
+        @param obj2: Second JSON object to compare
+        @param path str: Current path in the JSON structure
+        @param differences list: List to store found differences
+        @param max_diffs int: Maximum number of differences to report
+        @details Compares JSON objects recursively, checking for:
+                 - Type mismatches
+                 - Missing or extra keys in dictionaries
+                 - Length mismatches in lists
+                 - Value mismatches
         """
         if len(differences) >= max_diffs:
             return
@@ -130,7 +167,14 @@ class JsonComparator(TextComparator):
 
     def _compare_json_key_based(self, obj1, obj2, path, differences, max_diffs=10):
         """
-        Perform key-based JSON comparison for lists of objects
+        @brief Perform key-based JSON comparison for lists of objects
+        @param obj1: First JSON object to compare
+        @param obj2: Second JSON object to compare
+        @param path str: Current path in the JSON structure
+        @param differences list: List to store found differences
+        @param max_diffs int: Maximum number of differences to report
+        @details Similar to exact comparison but with special handling for lists
+                 of objects, using key fields to match items instead of position
         """
         if len(differences) >= max_diffs:
             return
@@ -208,7 +252,14 @@ class JsonComparator(TextComparator):
 
     def _compare_lists_by_key(self, list1, list2, path, differences, max_diffs=10):
         """
-        Compare two lists of dictionaries using key field(s) to match items
+        @brief Compare two lists of dictionaries using key field(s) to match items
+        @param list1 list: First list of dictionaries
+        @param list2 list: Second list of dictionaries
+        @param path str: Current path in the JSON structure
+        @param differences list: List to store found differences
+        @param max_diffs int: Maximum number of differences to report
+        @details Matches items in lists using specified key fields instead of position,
+                 allowing for reordered lists with the same content
         """
         # Convert key_field to list if it's a string
         key_fields = self.key_field if isinstance(self.key_field, list) else [self.key_field]

@@ -1,13 +1,39 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+@file result.py
+@brief Classes for representing file comparison results and differences
+@author Xiaotong Wang
+@date 2025
+"""
+
 class Difference:
-    """Represents a single difference between files"""
+    """
+    @brief Represents a single difference between files
+    @details This class encapsulates information about a single difference found
+             during file comparison, including position, expected and actual content,
+             and the type of difference.
+    """
     
     def __init__(self, position=None, expected=None, actual=None, diff_type="content"):
+        """
+        @brief Initialize a Difference object
+        @param position: Position of the difference (can be line number, byte position, etc.)
+        @param expected: Expected content at the position
+        @param actual: Actual content found at the position
+        @param diff_type: Type of difference ("content", "missing", "extra", etc.)
+        """
         self.position = position  # Can be line number, byte position, etc.
         self.expected = expected  # Expected content
         self.actual = actual      # Actual content
         self.diff_type = diff_type  # Type of difference: "content", "missing", "extra", etc.
     
     def __str__(self):
+        """
+        @brief Convert the difference to a string representation
+        @return str: Human-readable description of the difference
+        """
         if self.diff_type == "content":
             return f"At {self.position}: expected '{self.expected}', got '{self.actual}'"
         elif self.diff_type == "missing":
@@ -18,6 +44,10 @@ class Difference:
             return f"Difference at {self.position}"
     
     def to_dict(self):
+        """
+        @brief Convert the difference to a dictionary representation
+        @return dict: Dictionary containing the difference details
+        """
         return {
             "position": self.position,
             "expected": self.expected,
@@ -26,10 +56,24 @@ class Difference:
         }
 
 class ComparisonResult:
-    """Represents the result of a file comparison"""
+    """
+    @brief Represents the result of a file comparison
+    @details This class encapsulates all information about a file comparison,
+             including file paths, comparison range, differences found,
+             and additional metadata like file sizes and similarity index.
+    """
     
     def __init__(self, file1=None, file2=None, start_line=0, end_line=None, 
                  start_column=0, end_column=None):
+        """
+        @brief Initialize a ComparisonResult object
+        @param file1: Path to the first file
+        @param file2: Path to the second file
+        @param start_line: Starting line number for comparison (0-based)
+        @param end_line: Ending line number for comparison (0-based, None for end of file)
+        @param start_column: Starting column number for comparison (0-based)
+        @param end_column: Ending column number for comparison (0-based, None for end of line)
+        """
         self.file1 = file1
         self.file2 = file2
         self.file1_size = None
@@ -41,9 +85,13 @@ class ComparisonResult:
         self.identical = None
         self.differences = []
         self.error = None
-        self.similarity = None  # 新增相似度属性
+        self.similarity = None  # Similarity index for binary comparisons
     
     def __str__(self):
+        """
+        @brief Convert the comparison result to a string representation
+        @return str: Human-readable description of the comparison result
+        """
         if self.error:
             return f"Error during comparison: {self.error}"
         lines = []
@@ -59,6 +107,10 @@ class ComparisonResult:
         return "\n".join(lines)
     
     def _get_range_str(self):
+        """
+        @brief Get a string representation of the comparison range
+        @return str: Description of the line and column ranges being compared
+        """
         parts = []
         if self.start_line > 0 or self.end_line is not None:
             line_range = f"lines {self.start_line+1}"
@@ -77,6 +129,10 @@ class ComparisonResult:
         return ""
     
     def to_dict(self):
+        """
+        @brief Convert the comparison result to a dictionary representation
+        @return dict: Dictionary containing all comparison details
+        """
         return {
             "file1": self.file1,
             "file2": self.file2,
@@ -95,7 +151,12 @@ class ComparisonResult:
         }
     
     def to_html(self):
-        """Convert the result to HTML format"""
+        """
+        @brief Convert the comparison result to HTML format
+        @details Generates a complete HTML document with styling for displaying
+                 the comparison results in a web browser
+        @return str: HTML representation of the comparison result
+        """
         if self.error:
             return f"<div class='error'>Error during comparison: {self.error}</div>"
             

@@ -1,12 +1,39 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+@file xml_comparator.py
+@brief XML file comparator implementation with structural comparison
+@author Xiaotong Wang
+@date 2025
+"""
+
 import xml.etree.ElementTree as ET
 from .text_comparator import TextComparator
 from .result import Difference
 
 class XmlComparator(TextComparator):
-    """Comparator for XML files with structural comparison"""
+    """
+    @brief Comparator for XML files with structural comparison
+    @details This class extends TextComparator to provide specialized XML comparison
+             capabilities, including:
+             - Tag comparison
+             - Attribute comparison
+             - Text content comparison
+             - Child element comparison
+    """
     
     def read_content(self, file_path, start_line=0, end_line=None, start_column=0, end_column=None):
-        """Read XML content"""
+        """
+        @brief Read and parse XML content from file
+        @param file_path Path: Path to the XML file
+        @param start_line int: Starting line number
+        @param end_line int: Ending line number
+        @param start_column int: Starting column number
+        @param end_column int: Ending column number
+        @return ET.Element: Parsed XML element tree
+        @throws ValueError: If XML is invalid
+        """
         # First read the file as text
         text_content = super().read_content(file_path, start_line, end_line, start_column, end_column)
         
@@ -18,7 +45,14 @@ class XmlComparator(TextComparator):
             raise ValueError(f"Invalid XML in {file_path}: {str(e)}")
     
     def compare_content(self, content1, content2):
-        """Compare XML content"""
+        """
+        @brief Compare XML content structurally
+        @param content1 ET.Element: First XML element to compare
+        @param content2 ET.Element: Second XML element to compare
+        @return tuple: (bool, list) - (identical, differences)
+        @details Performs structural comparison of XML elements, including tags,
+                 attributes, text content, and child elements
+        """
         # Convert back to strings for comparison
         xml_str1 = ET.tostring(content1, encoding='unicode')
         xml_str2 = ET.tostring(content2, encoding='unicode')
@@ -33,7 +67,20 @@ class XmlComparator(TextComparator):
         return False, differences
     
     def _compare_elements(self, elem1, elem2, path, differences, max_diffs=10):
-        """Recursively compare XML elements and collect differences"""
+        """
+        @brief Recursively compare XML elements and collect differences
+        @param elem1 ET.Element: First XML element to compare
+        @param elem2 ET.Element: Second XML element to compare
+        @param path str: Current path in the XML structure
+        @param differences list: List to store found differences
+        @param max_diffs int: Maximum number of differences to report
+        @details Compares XML elements recursively, checking for:
+                 - Tag mismatches
+                 - Missing or extra attributes
+                 - Text content differences
+                 - Child element count mismatches
+                 - Child element differences
+        """
         if len(differences) >= max_diffs:
             return
             

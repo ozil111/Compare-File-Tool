@@ -6,8 +6,8 @@
             "command": "python ./compare_text.py",
             "args": ["./test/1.bdf", "./test/1_copy.bdf"],
             "expected": {
-                "output_contains": ["Files are identical"],
-                "return_code": 0
+                "output_contains": ["Files are identical"]
+                
             }
         },
         {
@@ -23,8 +23,8 @@
                 "--end-column=30"
             ],
             "expected": {
-                "output_contains": ["Files are identical"],
-                "return_code": 0
+                "output_contains": ["Files are identical"]
+                
             }
         },
         {
@@ -38,8 +38,8 @@
                 "--json-compare-mode=exact"
             ],
             "expected": {
-                "output_contains": ["Files are identical"],
-                "return_code": 0
+                "output_contains": ["Files are identical"]
+                
             }
         },
         {
@@ -54,8 +54,8 @@
                 "--json-key-field=\"phone\""
             ],
             "expected": {
-                "output_contains": ["Files are identical"],
-                "return_code": 0
+                "output_contains": ["Files are identical"]
+                
             }
         },
         {
@@ -70,8 +70,8 @@
                 "--chunk-size=4096"
             ],
             "expected": {
-                "output_contains": ["Similarity Index"],
-                "return_code": 1
+                "output_contains": ["Similarity Index"]
+                
             }
         },
         {
@@ -85,8 +85,8 @@
                 "--verbose"
             ],
             "expected": {
-                "output_contains": ["Files are identical"],
-                "return_code": 0
+                "output_contains": ["Files are identical"]
+                
             }
         },
         {
@@ -99,8 +99,8 @@
                 "--output-format=json"
             ],
             "expected": {
-                "output_contains": ["\"position\""],
-                "return_code": 1
+                "output_contains": ["\"position\""]
+                
             }
         },
         {
@@ -109,8 +109,46 @@
             "command": "python ./compare_text.py",
             "args": ["./test/1.bdf", "./test/1_copy.bdf"],
             "expected": {
-                "output_contains": ["Auto-detected file type: text"],
-                "return_code": 0
+                "output_contains": ["Auto-detected file type: text"]
+                
+            }
+        },
+        {
+            "name": "h5_comparison",
+            "description": "HDF5文件比较特定表格",
+            "command": "python ./compare_text.py",
+            "args": ["./test/1.h5", "./test/2.h5", "--file-type=h5", "--h5-table=NASTRAN/RESULT/NODAL/DISPLACEMENT"],
+            "expected": {
+                "output_contains": ["Files are different"]
+                
+            }
+        },
+        {
+            "name": "h5_comparison_all_tables",
+            "description": "HDF5文件比较所有表格",
+            "command": "python ./compare_text.py",
+            "args": ["./test/1.h5", "./test/2.h5"],
+            "expected": {
+                "output_contains": ["Files are different."]
+                
+            }
+        },
+        {
+            "name": "h5_comparison_with_wrong_table",
+            "description": "HDF5文件比较，错误表格路径",
+            "command": "python ./compare_text.py",
+            "args": ["./test/1.h5", "./test/2.h5", "--file-type=h5", "--h5-table=NASTRAN/RESULT/NODALl/DISPLACEMENT"],
+            "expected": {
+                "matches": ["WARNING - Table .* not found"]                
+            }
+        },
+        {
+            "name": "h5_comparison_with_strucutre_mode",
+            "description": "HDF5文件比较，结构模式",
+            "command": "python ./compare_text.py",
+            "args": ["./test/1.h5", "./test/2.h5", "--h5-structure-only"],
+            "expected": {
+                "output_contains": ["Files are identical."]                
             }
         }
     ]

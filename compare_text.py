@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+@file compare_text.py
+@brief Main script for comparing two files with various comparison methods
+@author Xiaotong Wang
+@date 2025
+"""
+
 import sys
 import os
 import argparse
@@ -7,13 +17,35 @@ from file_comparator.factory import ComparatorFactory
 from file_comparator.result import ComparisonResult
 
 def configure_logging():
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    return logging.getLogger("file_comparator")
+    """
+    @brief Configure logging settings for the application
+    @details Sets up a logger with console handler and formatter
+    @return logging.Logger: Configured logger instance
+    """
+    logger = logging.getLogger("file_comparator")
+    logger.setLevel(logging.INFO)
+    
+    # Create console handler
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    
+    # Create formatter
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    # Add formatter to ch
+    ch.setFormatter(formatter)
+    
+    # Add ch to logger
+    logger.addHandler(ch)
+    
+    return logger
 
 def parse_arguments():
+    """
+    @brief Parse command line arguments
+    @details Sets up argument parser with all necessary options for file comparison
+    @return argparse.Namespace: Parsed command line arguments
+    """
     parser = argparse.ArgumentParser(description="Compare two files.")
     parser.add_argument("file1", help="Path to the first file")
     parser.add_argument("file2", help="Path to the second file")
@@ -27,6 +59,7 @@ def parse_arguments():
     parser.add_argument("--output-format", choices=["text", "json", "html"], default="text",
                         help="Output format for the comparison result")
     parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose output")
+    parser.add_argument("--debug", action="store_true", help="Enable debug mode with detailed logging")
     parser.add_argument("--similarity", action="store_true",
                         help="When comparing binary files, compute and show similarity index")
     parser.add_argument("--num-threads", type=int, default=4, help="Number of threads for parallel processing")
@@ -37,13 +70,35 @@ def parse_arguments():
                       help="JSON comparison mode: exact (default) or key-based")
     json_group.add_argument("--json-key-field", help="Key field(s) to use for key-based JSON comparison (comma-separated for compound keys)")
     
+    # Add H5-specific comparison options
+    h5_group = parser.add_argument_group('HDF5 comparison options')
+    h5_group.add_argument("--h5-table", help="Comma-separated list of table names to compare in HDF5 files")
+    h5_group.add_argument("--h5-structure-only", action="store_true", 
+                         help="Only compare HDF5 file structure without comparing content")
+    h5_group.add_argument("--h5-show-content-diff", action="store_true",
+                         help="Show detailed content differences when content differs")
+    
     return parser.parse_args()
 
 def main():
+    """
+    @brief Main entry point of the application
+    @details Handles the main workflow of file comparison including:
+             - Setting up logging
+             - Parsing arguments
+             - Creating appropriate comparator
+             - Performing comparison
+             - Outputting results
+    """
     logger = configure_logging()
 
     try:
         args = parse_arguments()
+        
+        # Set debug level if requested
+        if args.debug:
+            logger.setLevel(logging.DEBUG)
+            logger.debug("Debug mode enabled")
 
         # Adjust for 0-based indexing
         start_line = max(0, args.start_line - 1)
@@ -68,27 +123,37 @@ def main():
             file_type = detect_file_type(file1_path)
             logger.info(f"Auto-detected file type: {file_type}")
 
-        # Create comparator instance
+        # Prepare comparator kwargs based on file type and arguments
         comparator_kwargs = {
             "encoding": args.encoding,
             "chunk_size": args.chunk_size,
-            "verbose": args.verbose,
+            "verbose": args.verbose or args.debug,  # Enable verbose mode if debug is enabled
             "num_threads": args.num_threads
         }
         
-        # If comparing binary files and similarity is enabled, pass the parameter
-        if file_type == "binary":
-            comparator_kwargs["similarity"] = args.similarity
-        
-        # Add JSON-specific options if applicable
+        # Add file type specific arguments
         if file_type == "json" and args.json_compare_mode:
             comparator_kwargs["compare_mode"] = args.json_compare_mode
             if args.json_key_field:
-                # Handle comma-separated key fields for compound keys
                 key_fields = [field.strip() for field in args.json_key_field.split(',')]
                 comparator_kwargs["key_field"] = key_fields[0] if len(key_fields) == 1 else key_fields
                 logger.info(f"Using key field(s): {comparator_kwargs['key_field']} for JSON comparison")
         
+        if file_type == "h5":
+            if args.h5_table:
+                tables = [table.strip() for table in args.h5_table.split(',')]
+                comparator_kwargs["tables"] = tables
+                logger.info(f"Comparing HDF5 tables: {tables}")
+            comparator_kwargs["structure_only"] = args.h5_structure_only
+            comparator_kwargs["show_content_diff"] = args.h5_show_content_diff
+            if args.h5_structure_only:
+                logger.info("Only comparing HDF5 file structure")
+            comparator_kwargs["debug"] = args.debug
+        
+        if file_type == "binary":
+            comparator_kwargs["similarity"] = args.similarity
+
+        # Create comparator instance
         comparator = ComparatorFactory.create_comparator(
             file_type,
             **comparator_kwargs
@@ -119,6 +184,11 @@ def main():
         sys.exit(1)
 
 def detect_file_type(file_path):
+    """
+    @brief Detect the type of file based on its extension
+    @param file_path Path to the file to analyze
+    @return str: Detected file type ('text', 'json', 'xml', 'csv', 'h5', or 'binary')
+    """
     # Auto-detect file type based on extension
     extension = file_path.suffix.lower()
 
@@ -130,11 +200,19 @@ def detect_file_type(file_path):
         return 'xml'
     elif extension in ['.csv']:
         return 'csv'
+    elif extension in ['.h5', '.hdf5', '.he5']:
+        return 'h5'
     else:
         # Default to binary comparison for unknown extensions
         return 'binary'
 
 def format_result(result, output_format):
+    """
+    @brief Format the comparison result according to the specified output format
+    @param result ComparisonResult object containing the comparison results
+    @param output_format Desired output format ('text', 'json', or 'html')
+    @return str: Formatted comparison result
+    """
     # Format the comparison result according to the requested output format
     if output_format == "json":
         import json

@@ -1,20 +1,53 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+@file binary_comparator.py
+@brief Binary file comparator implementation with efficient byte-level comparison
+@author Xiaotong Wang
+@date 2025
+"""
+
 import hashlib
 from .base_comparator import BaseComparator
 from .result import Difference
 from concurrent.futures import ThreadPoolExecutor
 
 class BinaryComparator(BaseComparator):
+    """
+    @brief Comparator for binary files with efficient byte-level comparison
+    @details This class implements binary file comparison with support for:
+             - Byte-level difference detection
+             - Similarity index calculation using LCS
+             - Parallel processing for large files
+             - File hash calculation
+    """
+    
     def __init__(self, encoding="utf-8", chunk_size=8192, verbose=False, similarity=False, num_threads=4):
+        """
+        @brief Initialize the binary comparator
+        @param encoding str: File encoding (not used for binary files)
+        @param chunk_size int: Size of chunks for reading large files
+        @param verbose bool: Enable verbose logging
+        @param similarity bool: Enable similarity index calculation
+        @param num_threads int: Number of threads for parallel processing
+        """
         super().__init__(encoding, chunk_size, verbose)
         self.similarity = similarity
         self.num_threads = num_threads
 
     def read_content(self, file_path, start_line=0, end_line=None, start_column=0, end_column=None):
         """
-        Read binary content. For binary files, the parameters are interpreted as:
-        start_line: starting byte offset
-        end_line: ending byte offset
-        start_column/end_column: ignored for binary files
+        @brief Read binary content with specified range
+        @param file_path Path: Path to the binary file to read
+        @param start_line int: Starting byte offset (interpreted as bytes for binary files)
+        @param end_line int: Ending byte offset (interpreted as bytes for binary files)
+        @param start_column int: Ignored for binary files
+        @param end_column int: Ignored for binary files
+        @return bytes: Binary content within the specified range
+        @throws ValueError: If byte offsets are invalid
+        @throws FileNotFoundError: If file doesn't exist
+        @throws IOError: If there are other file reading errors
         """
         try:
             self.logger.debug(f"Reading binary file: {file_path}")
@@ -43,7 +76,15 @@ class BinaryComparator(BaseComparator):
             raise ValueError(f"Error reading file {file_path}: {str(e)}")
     
     def compare_content(self, content1, content2):
-        """Compare binary content efficiently"""
+        """
+        @brief Compare binary content efficiently
+        @param content1 bytes: First binary content to compare
+        @param content2 bytes: Second binary content to compare
+        @return tuple: (bool, list) - (identical, differences)
+        @details Performs efficient byte-level comparison of binary content.
+                 Reports differences with hex context and limits the number
+                 of differences to avoid overwhelming output.
+        """
         self.logger.debug(f"Comparing binary content")
         
         if len(content1) != len(content2):
@@ -104,7 +145,14 @@ class BinaryComparator(BaseComparator):
         return identical, differences
 
     def compute_lcs_length(self, a: bytes, b: bytes) -> int:
-# 利用二维 DP 来计算最长公共子序列 (内存占用优化为一维数组)
+        """
+        @brief Compute the length of the longest common subsequence
+        @param a bytes: First binary sequence
+        @param b bytes: Second binary sequence
+        @return int: Length of the longest common subsequence
+        @details Uses dynamic programming with memory optimization to compute LCS.
+                 Supports parallel processing for large sequences.
+        """
         if not a or not b:
             return 0
 
@@ -133,6 +181,16 @@ class BinaryComparator(BaseComparator):
         return lcs_length
 
     def compare_files(self, file1, file2, start_line=0, end_line=None, start_column=0, end_column=None):
+        """
+        @brief Compare two binary files with optional similarity calculation
+        @param file1 Path: Path to the first binary file
+        @param file2 Path: Path to the second binary file
+        @param start_line int: Starting byte offset
+        @param end_line int: Ending byte offset
+        @param start_column int: Ignored for binary files
+        @param end_column int: Ignored for binary files
+        @return ComparisonResult: Result object containing comparison details
+        """
         from pathlib import Path
         from .result import ComparisonResult
         result = ComparisonResult(
@@ -171,7 +229,12 @@ class BinaryComparator(BaseComparator):
             return result
 
     def get_file_hash(self, file_path, chunk_size=8192):
-        """Calculate SHA-256 hash of a file efficiently"""
+        """
+        @brief Calculate SHA-256 hash of a file efficiently
+        @param file_path Path: Path to the file to hash
+        @param chunk_size int: Size of chunks for reading large files
+        @return str: Hexadecimal representation of the file's SHA-256 hash
+        """
         h = hashlib.sha256()
         with open(file_path, 'rb') as f:
             for chunk in iter(lambda: f.read(chunk_size), b''):

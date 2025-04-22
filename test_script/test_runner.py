@@ -2,6 +2,7 @@ import json
 import os
 import subprocess
 import sys
+import re
 from pathlib import Path
 
 class JSONTestRunner:
@@ -61,20 +62,20 @@ class JSONTestRunner:
             # 合并输出
             full_output = process.stdout + process.stderr
             
-            # 验证返回码
-            # if process.returncode != case["expected"]["return_code"]:
-            #     result["message"] = (
-            #         f"返回码不匹配 (预期: {case['expected']['return_code']}, "
-            #         f"实际: {process.returncode})"
-            #     )
-            #     return result
-                
-            # 验证输出内容（模糊匹配）
-            for keyword in case["expected"]["output_contains"]:
-                if keyword not in full_output:
-                    result["message"] = f"未找到关键内容: {keyword}"
-                    return result
-                    
+            # Check for expected output patterns
+            if "output_contains" in case["expected"]:
+                for keyword in case["expected"]["output_contains"]:
+                    if keyword not in full_output:
+                        result["message"] = f"未找到关键内容: {keyword}"
+                        return result
+            
+            # Check for regex pattern matches
+            if "matches" in case["expected"]:
+                for pattern in case["expected"]["matches"]:
+                    if not re.search(pattern, full_output):
+                        result["message"] = f"未找到匹配模式: {pattern}"
+                        return result
+
             # 所有检查通过
             result["status"] = "passed"
             return result

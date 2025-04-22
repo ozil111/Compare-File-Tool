@@ -1,12 +1,39 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+@file text_comparator.py
+@brief Text file comparator implementation with line-by-line comparison
+@author Xiaotong Wang
+@date 2025
+"""
+
 import difflib
 from .base_comparator import BaseComparator
 from .result import Difference
 
 class TextComparator(BaseComparator):
-    """Comparator for text files with line-by-line comparison"""
+    """
+    @brief Comparator for text files with line-by-line comparison
+    @details This class implements text file comparison using Python's difflib
+             for detailed difference detection. It supports line and column-based
+             range selection for comparison.
+    """
     
     def read_content(self, file_path, start_line=0, end_line=None, start_column=0, end_column=None):
-        """Read text content with specified range"""
+        """
+        @brief Read text content with specified range
+        @param file_path Path: Path to the text file to read
+        @param start_line int: Starting line number (0-based)
+        @param end_line int: Ending line number (0-based, None for end of file)
+        @param start_column int: Starting column number (0-based)
+        @param end_column int: Ending column number (0-based, None for end of line)
+        @return list: List of text lines within the specified range
+        @throws ValueError: If line or column ranges are invalid
+        @throws UnicodeDecodeError: If file encoding is incorrect
+        @throws FileNotFoundError: If file doesn't exist
+        @throws IOError: If there are other file reading errors
+        """
         try:
             self.logger.debug(f"Reading text file: {file_path}")
             with open(file_path, 'r', encoding=self.encoding) as f:
@@ -59,7 +86,16 @@ class TextComparator(BaseComparator):
             raise ValueError(f"Error reading file {file_path}: {str(e)}")
     
     def compare_content(self, content1, content2):
-        """Compare text content and return detailed differences"""
+        """
+        @brief Compare text content and return detailed differences
+        @param content1 list: First list of text lines to compare
+        @param content2 list: Second list of text lines to compare
+        @return tuple: (bool, list) - (identical, differences)
+        @details Uses difflib to generate a detailed comparison of the text content.
+                 Returns a tuple containing a boolean indicating if the content is identical
+                 and a list of Difference objects describing any differences found.
+                 Limits the number of differences reported to 10 to avoid overwhelming output.
+        """
         self.logger.debug(f"Comparing text content")
         
         if content1 == content2:

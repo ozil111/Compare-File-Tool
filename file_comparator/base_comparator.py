@@ -1,12 +1,32 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+@file base_comparator.py
+@brief Base abstract class for file comparison operations
+@author Xiaotong Wang
+@date 2025
+"""
+
 from abc import ABC, abstractmethod
 import logging
 from pathlib import Path
 from .result import ComparisonResult, Difference
 
 class BaseComparator(ABC):
-    """Base abstract class for all file comparators"""
+    """
+    @brief Base abstract class for all file comparators
+    @details This class defines the interface and common functionality for all file comparators.
+             It provides basic file comparison operations and logging capabilities.
+    """
     
     def __init__(self, encoding="utf-8", chunk_size=8192, verbose=False):
+        """
+        @brief Initialize the base comparator
+        @param encoding str: File encoding to use (default: "utf-8")
+        @param chunk_size int: Size of chunks for reading large files (default: 8192)
+        @param verbose bool: Enable verbose logging (default: False)
+        """
         self.encoding = encoding
         self.chunk_size = chunk_size
         self.logger = logging.getLogger(f"file_comparator.{self.__class__.__name__}")
@@ -15,16 +35,38 @@ class BaseComparator(ABC):
     
     @abstractmethod
     def read_content(self, file_path, start_line=0, end_line=None, start_column=0, end_column=None):
-        """Read file content with specified range"""
+        """
+        @brief Read file content with specified range
+        @param file_path Path: Path to the file to read
+        @param start_line int: Starting line number (0-based)
+        @param end_line int: Ending line number (0-based, None for end of file)
+        @param start_column int: Starting column number (0-based)
+        @param end_column int: Ending column number (0-based, None for end of line)
+        @return object: File content in a format suitable for comparison
+        """
         pass
 
     @abstractmethod
     def compare_content(self, content1, content2):
-        """Compare two content objects and return comparison details"""
+        """
+        @brief Compare two content objects and return comparison details
+        @param content1 object: First content object to compare
+        @param content2 object: Second content object to compare
+        @return tuple: (bool, list) - (identical, differences)
+        """
         pass
 
     def compare_files(self, file1, file2, start_line=0, end_line=None, start_column=0, end_column=None):
-        """Compare two files with the specified parameters"""
+        """
+        @brief Compare two files with the specified parameters
+        @param file1 Path: Path to the first file
+        @param file2 Path: Path to the second file
+        @param start_line int: Starting line number (0-based)
+        @param end_line int: Ending line number (0-based, None for end of file)
+        @param start_column int: Starting column number (0-based)
+        @param end_column int: Ending column number (0-based, None for end of line)
+        @return ComparisonResult: Result object containing comparison details
+        """
         result = ComparisonResult(
             file1=str(file1),
             file2=str(file2),
