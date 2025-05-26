@@ -77,6 +77,10 @@ def parse_arguments():
                          help="Only compare HDF5 file structure without comparing content")
     h5_group.add_argument("--h5-show-content-diff", action="store_true",
                          help="Show detailed content differences when content differs")
+    h5_group.add_argument("--h5-rtol", type=float, default=1e-5,
+                         help="Relative tolerance for numerical comparison in HDF5 files")
+    h5_group.add_argument("--h5-atol", type=float, default=1e-8,
+                         help="Absolute tolerance for numerical comparison in HDF5 files")
     
     return parser.parse_args()
 
@@ -146,8 +150,11 @@ def main():
                 logger.info(f"Comparing HDF5 tables: {tables}")
             comparator_kwargs["structure_only"] = args.h5_structure_only
             comparator_kwargs["show_content_diff"] = args.h5_show_content_diff
+            comparator_kwargs["rtol"] = args.h5_rtol
+            comparator_kwargs["atol"] = args.h5_atol
             if args.h5_structure_only:
                 logger.info("Only comparing HDF5 file structure")
+            logger.info(f"Using numerical comparison tolerances: rtol={args.h5_rtol}, atol={args.h5_atol}")
             comparator_kwargs["debug"] = args.debug
         
         if file_type == "binary":

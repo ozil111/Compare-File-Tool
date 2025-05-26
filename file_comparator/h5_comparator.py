@@ -4,24 +4,28 @@ import numpy as np
 import logging
 
 class H5Comparator(BaseComparator):
-    def __init__(self, tables=None, structure_only=False, show_content_diff=False, debug=False, **kwargs):
+    def __init__(self, tables=None, structure_only=False, show_content_diff=False, debug=False, rtol=1e-5, atol=1e-8, **kwargs):
         """
         Initialize H5 comparator
         :param tables: List of table names to compare. If None, compare all tables
         :param structure_only: If True, only compare file structure without comparing content
         :param show_content_diff: If True, show detailed content differences
         :param debug: If True, enable debug mode
+        :param rtol: Relative tolerance for numerical comparison
+        :param atol: Absolute tolerance for numerical comparison
         """
         super().__init__(**kwargs)
         self.tables = tables
         self.structure_only = structure_only
         self.show_content_diff = show_content_diff
+        self.rtol = rtol
+        self.atol = atol
         
         # Set debug level if verbose is enabled
         if kwargs.get('verbose', False) or debug:
             self.logger.setLevel(logging.DEBUG)
             
-        self.logger.debug(f"Initialized H5Comparator with structure_only={structure_only}, show_content_diff={show_content_diff}")
+        self.logger.debug(f"Initialized H5Comparator with structure_only={structure_only}, show_content_diff={show_content_diff}, rtol={rtol}, atol={atol}")
 
     def read_content(self, file_path, start_line=0, end_line=None, start_column=0, end_column=None):
         """Read H5 file content"""
@@ -232,7 +236,7 @@ class H5Comparator(BaseComparator):
                         try:
                             # 对于数值类型数据使用 isclose
                             if np.issubdtype(data1.dtype, np.number) and np.issubdtype(data2.dtype, np.number):
-                                equal_mask = np.isclose(data1, data2, equal_nan=True, rtol=1e-5, atol=1e-8)
+                                equal_mask = np.isclose(data1, data2, equal_nan=True, rtol=self.rtol, atol=self.atol)
                             # 对于字符串或其他类型直接比较
                             else:
                                 equal_mask = (data1 == data2)

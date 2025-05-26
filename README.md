@@ -82,6 +82,8 @@ Available parameters:
 | `--h5-table`                     | (HDF5 only) Specify tables/datasets                          |
 | `--h5-structure-only`            | (HDF5 only) Compare structure only                           |
 | `--h5-show-content-diff`         | (HDF5 only) Show detailed differences                        |
+| `--h5-rtol`                      | (HDF5 only) Relative tolerance for numerical comparison (default: 1e-5) |
+| `--h5-atol`                      | (HDF5 only) Absolute tolerance for numerical comparison (default: 1e-8) |
 | `--verbose`, `--debug`           | Enable detailed logs                                         |
 | `--num-threads`                  | Parallelism (default: 4)                                     |
 
@@ -106,6 +108,8 @@ python compare_text.py file1.h5 file2.h5 \
   --h5-table dataset1,group1/dataset2 \
   --h5-structure-only \
   --h5-show-content-diff \
+  --h5-rtol 1e-4 \
+  --h5-atol 1e-6 \
   --verbose
 ```
 
