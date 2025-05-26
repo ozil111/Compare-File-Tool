@@ -112,15 +112,32 @@ class H5Comparator(BaseComparator):
                         return True
                     return False
                 
-                for name, item in f.items():
-                    if should_process(name):
+                def process_item(name, item):
+                    try:
+                        if self.structure_only:
+                            collect_structure(name, item)
+                        else:
+                            collect_structure_and_data(name, item)
+                    except Exception as e:
+                        self.logger.error(f"Error processing {name}: {str(e)}")
+                
+                # First try direct path access for table names
+                if self.tables:
+                    for table_path in self.tables:
                         try:
-                            if self.structure_only:
-                                collect_structure(name, item)
+                            if table_path in f:
+                                process_item(table_path, f[table_path])
                             else:
-                                collect_structure_and_data(name, item)
+                                self.logger.warning(f"Table {table_path} not found in {file_path}")
                         except Exception as e:
-                            self.logger.error(f"Error processing {name}: {str(e)}")
+                            self.logger.error(f"Error processing {table_path}: {str(e)}")
+                
+                # Then process regex pattern if specified
+                if regex_pattern:
+                    def visit_with_regex(name, obj):
+                        if should_process(name):
+                            process_item(name, obj)
+                    f.visititems(visit_with_regex)
             else:
                 # If no tables specified, read all datasets
                 if self.structure_only:
@@ -248,31 +265,49 @@ class H5Comparator(BaseComparator):
                             # 对于数值类型数据使用 isclose
                             if np.issubdtype(data1.dtype, np.number) and np.issubdtype(data2.dtype, np.number):
                                 equal_mask = np.isclose(data1, data2, equal_nan=True, rtol=self.rtol, atol=self.atol)
-                            # 对于字符串或其他类型直接比较
-                            else:
-                                equal_mask = (data1 == data2)
-                                
-                            if not np.all(equal_mask):
-                                diff_indices = np.where(~equal_mask)
-                                if self.show_content_diff:
-                                    # Report up to 10 differences
-                                    for idx in zip(*diff_indices)[:10]:
-                                        position = f"{table_name}[{','.join(map(str, idx))}]"
+                                if not np.all(equal_mask):
+                                    diff_indices = np.where(~equal_mask)
+                                    if self.show_content_diff:
+                                        # Report up to 10 differences
+                                        for idx in zip(*diff_indices)[:10]:
+                                            position = f"{table_name}[{','.join(map(str, idx))}]"
+                                            differences.append(self._create_difference(
+                                                position=position,
+                                                expected=str(data1[idx]),
+                                                actual=str(data2[idx]),
+                                                diff_type="content"
+                                            ))
+                                    else:
+                                        # Just report that content differs
                                         differences.append(self._create_difference(
-                                            position=position,
-                                            expected=str(data1[idx]),
-                                            actual=str(data2[idx]),
+                                            position=table_name,
+                                            expected="Same content",
+                                            actual="Content differs",
                                             diff_type="content"
                                         ))
-                                else:
-                                    # Just report that content differs
-                                    differences.append(self._create_difference(
-                                        position=table_name,
-                                        expected="Same content",
-                                        actual="Content differs",
-                                        diff_type="content"
-                                    ))
-                                identical = False
+                                    identical = False
+                            # 对于字符串或其他类型直接比较
+                            else:
+                                if not np.array_equal(data1, data2):
+                                    if self.show_content_diff:
+                                        # For non-numeric arrays, find the first difference
+                                        diff_indices = np.where(data1 != data2)
+                                        for idx in zip(*diff_indices)[:10]:
+                                            position = f"{table_name}[{','.join(map(str, idx))}]"
+                                            differences.append(self._create_difference(
+                                                position=position,
+                                                expected=str(data1[idx]),
+                                                actual=str(data2[idx]),
+                                                diff_type="content"
+                                            ))
+                                    else:
+                                        differences.append(self._create_difference(
+                                            position=table_name,
+                                            expected="Same content",
+                                            actual="Content differs",
+                                            diff_type="content"
+                                        ))
+                                    identical = False
                         except Exception as e:
                             self.logger.error(f"Error comparing data in table {table_name}: {str(e)}")
                             differences.append(self._create_difference(

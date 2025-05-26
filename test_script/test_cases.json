@@ -168,6 +168,15 @@
             "expected": {
                 "output_contains": ["Files are identical"]
             }
+        },
+        {
+            "name": "h5_comparison_with_table_regex",
+            "description": "HDF5文件比较，表格正则表达式",
+            "command": "python ./compare_text.py",
+            "args": ["./test/1.h5", "./test/1_copy.h5", "--h5-table-regex=NASTRAN/RESULT/NODAL/\\bstr(?:ess|ain)\\b"],
+            "expected": {
+                "output_contains": ["Files are identical"]
+            }
         }
     ]
 }
