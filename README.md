@@ -80,6 +80,7 @@ Available parameters:
 | `--json-key-field`               | Key fields for JSON matching                                 |
 | `--similarity`                   | (Binary only) Compute similarity index                       |
 | `--h5-table`                     | (HDF5 only) Specify tables/datasets                          |
+| `--h5-table-regex`               | (HDF5 only) Regular expression pattern to match table names  |
 | `--h5-structure-only`            | (HDF5 only) Compare structure only                           |
 | `--h5-show-content-diff`         | (HDF5 only) Show detailed differences                        |
 | `--h5-rtol`                      | (HDF5 only) Relative tolerance for numerical comparison (default: 1e-5) |
@@ -98,11 +99,12 @@ Available parameters:
 | **XML**    | Structure, attributes, and content diffing                   |
 | **CSV**    | Row-by-row, column-by-column analysis                        |
 | **Binary** | Chunked comparison, SHA-256 hashing, similarity index        |
-| **HDF5**   | Structure + content comparison, dataset selection, numerical tolerance |
+| **HDF5**   | Structure + content comparison, dataset selection, numerical tolerance, regex table matching |
 
 Example HDF5 comparison:
 
 ```bash
+# Compare specific tables
 python compare_text.py file1.h5 file2.h5 \
   --file-type h5 \
   --h5-table dataset1,group1/dataset2 \
@@ -111,7 +113,21 @@ python compare_text.py file1.h5 file2.h5 \
   --h5-rtol 1e-4 \
   --h5-atol 1e-6 \
   --verbose
+
+# Compare tables matching a pattern
+python compare_text.py file1.h5 file2.h5 \
+  --file-type h5 \
+  --h5-table-regex "^time.*" \
+  --h5-show-content-diff \
+  --verbose
 ```
+
+The HDF5 comparison supports:
+- Exact table name matching with `--h5-table`
+- Regular expression pattern matching with `--h5-table-regex`
+- Structure-only comparison with `--h5-structure-only`
+- Detailed content differences with `--h5-show-content-diff`
+- Configurable numerical comparison tolerances with `--h5-rtol` and `--h5-atol`
 
 ------
 

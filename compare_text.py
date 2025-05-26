@@ -73,6 +73,7 @@ def parse_arguments():
     # Add H5-specific comparison options
     h5_group = parser.add_argument_group('HDF5 comparison options')
     h5_group.add_argument("--h5-table", help="Comma-separated list of table names to compare in HDF5 files")
+    h5_group.add_argument("--h5-table-regex", help="Regular expression pattern to match table names in HDF5 files")
     h5_group.add_argument("--h5-structure-only", action="store_true", 
                          help="Only compare HDF5 file structure without comparing content")
     h5_group.add_argument("--h5-show-content-diff", action="store_true",
@@ -148,6 +149,9 @@ def main():
                 tables = [table.strip() for table in args.h5_table.split(',')]
                 comparator_kwargs["tables"] = tables
                 logger.info(f"Comparing HDF5 tables: {tables}")
+            if args.h5_table_regex:
+                comparator_kwargs["table_regex"] = args.h5_table_regex
+                logger.info(f"Using table regex pattern: {args.h5_table_regex}")
             comparator_kwargs["structure_only"] = args.h5_structure_only
             comparator_kwargs["show_content_diff"] = args.h5_show_content_diff
             comparator_kwargs["rtol"] = args.h5_rtol

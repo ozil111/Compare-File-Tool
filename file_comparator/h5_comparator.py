@@ -2,12 +2,14 @@ from .base_comparator import BaseComparator
 import h5py
 import numpy as np
 import logging
+import re
 
 class H5Comparator(BaseComparator):
-    def __init__(self, tables=None, structure_only=False, show_content_diff=False, debug=False, rtol=1e-5, atol=1e-8, **kwargs):
+    def __init__(self, tables=None, table_regex=None, structure_only=False, show_content_diff=False, debug=False, rtol=1e-5, atol=1e-8, **kwargs):
         """
         Initialize H5 comparator
         :param tables: List of table names to compare. If None, compare all tables
+        :param table_regex: Regular expression pattern to match table names
         :param structure_only: If True, only compare file structure without comparing content
         :param show_content_diff: If True, show detailed content differences
         :param debug: If True, enable debug mode
@@ -16,6 +18,7 @@ class H5Comparator(BaseComparator):
         """
         super().__init__(**kwargs)
         self.tables = tables
+        self.table_regex = table_regex
         self.structure_only = structure_only
         self.show_content_diff = show_content_diff
         self.rtol = rtol
@@ -26,6 +29,8 @@ class H5Comparator(BaseComparator):
             self.logger.setLevel(logging.DEBUG)
             
         self.logger.debug(f"Initialized H5Comparator with structure_only={structure_only}, show_content_diff={show_content_diff}, rtol={rtol}, atol={atol}")
+        if table_regex:
+            self.logger.debug(f"Using table regex pattern: {table_regex}")
 
     def read_content(self, file_path, start_line=0, end_line=None, start_column=0, end_column=None):
         """Read H5 file content"""
@@ -96,20 +101,26 @@ class H5Comparator(BaseComparator):
                     }
                     self.logger.debug(f"Collected structure for group: {name}")
             
-            if self.tables:
-                # If specific tables are specified, read only those
-                for table_path in self.tables:
-                    try:
-                        if table_path in f:
-                            item = f[table_path]
+            if self.tables or self.table_regex:
+                # If specific tables or regex pattern is specified
+                regex_pattern = re.compile(self.table_regex) if self.table_regex else None
+                
+                def should_process(name):
+                    if self.tables and name in self.tables:
+                        return True
+                    if regex_pattern and regex_pattern.match(name):
+                        return True
+                    return False
+                
+                for name, item in f.items():
+                    if should_process(name):
+                        try:
                             if self.structure_only:
-                                collect_structure(table_path, item)
+                                collect_structure(name, item)
                             else:
-                                collect_structure_and_data(table_path, item)
-                        else:
-                            self.logger.warning(f"Table {table_path} not found in {file_path}")
-                    except Exception as e:
-                        self.logger.error(f"Error processing {table_path}: {str(e)}")
+                                collect_structure_and_data(name, item)
+                        except Exception as e:
+                            self.logger.error(f"Error processing {name}: {str(e)}")
             else:
                 # If no tables specified, read all datasets
                 if self.structure_only:
